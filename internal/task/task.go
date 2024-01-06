@@ -2,6 +2,7 @@ package task
 
 import (
 	"reflect"
+	"strings"
 )
 
 const (
@@ -18,16 +19,32 @@ const (
 	StatusClosed string = "closed"
 
 	FieldId string = "Id"
+	FieldTitle string = "Title"
+	FieldUrl string = "Url"
+	FieldDescription string = "Description"
+	FieldNote string = "Note"
+	FieldStatus string = "Status"
+	FieldPriority string = "Priority"
 )
 
 var (
-	TaskAddFields = []string{"Title", "Url", "Description", "Note", "Status", "Priority"}
-	TaskRowFields = []string{"Title", "Url", "Description"}
-	TaskEditorFields = []string{"Note"}
-	TaskChoiceFields = []string{"Status", "Priority"}
+	LCFieldTitle string = strings.ToLower(FieldTitle)
+	LCFieldUrl string = strings.ToLower(FieldUrl)
+	LCFieldDescription string = strings.ToLower(FieldDescription)
+	LCFieldNote string = strings.ToLower(FieldNote)
+	LCFieldStatus string = strings.ToLower(FieldStatus)
+	LCFieldPriority string = strings.ToLower(FieldPriority)
+	LCTaskFields = []string{LCFieldTitle, LCFieldUrl, LCFieldDescription, LCFieldNote, LCFieldStatus, LCFieldPriority}
+	LCSubTaskFields = []string{LCFieldTitle, LCFieldDescription, LCFieldNote}
+
+	TaskAddFields = []string{FieldTitle, FieldUrl, FieldDescription, FieldNote, FieldStatus, FieldPriority}
+	TaskEditFields = []string{FieldTitle, FieldUrl, FieldDescription, FieldNote, FieldStatus, FieldPriority}
+	TaskRowFields = []string{FieldTitle, FieldUrl, FieldDescription}
+	TaskEditorFields = []string{FieldNote}
+	TaskChoiceFields = []string{FieldStatus, FieldPriority}
 	Choices = map[string][]string{
-		"Status": {StatusNew, StatusOpen, StatusPause, StatusClosed},
-		"Priority": {PriorityLow, PriorityMedium, PriorityHigh, PriorityUrgent},
+		FieldStatus: {StatusNew, StatusOpen, StatusPause, StatusClosed},
+		FieldPriority: {PriorityLow, PriorityMedium, PriorityHigh, PriorityUrgent},
 	}
 )
 
@@ -94,6 +111,14 @@ func GetTasks()(Yaml, []Task){
 	return y, tasks
 }
 
+func GetTaskFieldValue(taskId string, fieldName string)string{
+	task := GetTask(taskId)
+	t := &task
+	taskElements := reflect.ValueOf(t).Elem()
+	taskField := taskElements.FieldByName(fieldName)
+	return taskField.String()
+}
+
 func EditTask(taskId string, fieldName string, fieldData string)error{
 	y, tasks := GetTasks()
 	taskIndex := FindIndex(tasks, FieldId, taskId)
@@ -105,6 +130,7 @@ func EditTask(taskId string, fieldName string, fieldData string)error{
 	if taskField.CanSet(){
 		taskField.SetString(fieldData)
 	}
+	t.Updated = GetCurrentTime()
 	
 	y.Write(tasks)
 	return nil

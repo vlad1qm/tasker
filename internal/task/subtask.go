@@ -5,9 +5,10 @@ import (
 )
 
 var (
-	SubTaskAddFields = []string{"Title", "Description", "Note"}
-	SubTaskRowFields = []string{"Title", "Description"}
-	SubTaskEditorFields = []string{"Note"}
+	SubTaskAddFields = []string{FieldTitle, FieldDescription, FieldNote}
+	SubTaskEditFields = []string{FieldTitle, FieldDescription, FieldNote}
+	SubTaskRowFields = []string{FieldTitle, FieldDescription}
+	SubTaskEditorFields = []string{FieldNote}
 	SubTaskChoiceFields = []string{}
 )
 
@@ -77,6 +78,14 @@ func GetSubTasks(taskId string)[]SubTask{
 	return []SubTask{}
 }
 
+func GetSubTaskFieldValue(taskId string, subTaskId string, fieldName string)string{
+	subtask := GetSubTask(taskId, subTaskId)
+	st := &subtask
+	taskElements := reflect.ValueOf(st).Elem()
+	taskField := taskElements.FieldByName(fieldName)
+	return taskField.String()
+}
+
 func EditSubTask[F FieldType](taskId string, subTaskId string, fieldName string, fieldData F)error{
 	fieldType := reflect.ValueOf(fieldData)
 	y, tasks := GetTasks()
@@ -99,6 +108,7 @@ func EditSubTask[F FieldType](taskId string, subTaskId string, fieldName string,
 			taskField.SetBool(fieldType.Bool())
 		}
 	}
+	st.Updated = GetCurrentTime()
 	y.Write(tasks)
 	return nil
 }

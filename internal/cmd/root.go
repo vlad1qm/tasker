@@ -29,15 +29,26 @@ func Execute(){
 func init(){
 	rootCmd.AddCommand(ListCmd)
 	rootCmd.AddCommand(AddCmd)
+	rootCmd.AddCommand(EditCmd)
 	rootCmd.AddCommand(ShowCmd)
 	rootCmd.AddCommand(DeleteCmd)
+
+	EditCmd.Flags().VarP(TaskFieldsChoices, "field", "f", TaskFieldChoicesHelp)
+	EditCmd.PersistentFlags().IntVarP(&taskId, "id", "i", 0, "task id")
+	EditCmd.AddCommand(SubEditCmd)
+	SubEditCmd.Flags().VarP(SubTaskFieldsChoices, "field", "f", SubTaskFieldChoicesHelp)
+	SubEditCmd.PersistentFlags().IntVarP(&subTaskId, "sid", "s", 0, "sub task id")
+
 	ListCmd.AddCommand(SubListCmd)
 	SubListCmd.PersistentFlags().IntVarP(&taskId, "id", "i", 0, "task id")
+
 	AddCmd.AddCommand(SubAddCmd)
 	SubAddCmd.PersistentFlags().IntVarP(&taskId, "id", "i", 0, "task id")
+
 	ShowCmd.AddCommand(SubShowCmd)
 	ShowCmd.PersistentFlags().IntVarP(&taskId, "id", "i", 0, "task id")
 	SubShowCmd.PersistentFlags().IntVarP(&subTaskId, "sid", "s", 0, "sub task id")
+
 	DeleteCmd.AddCommand(SubDeleteCmd)
 	DeleteCmd.PersistentFlags().IntVarP(&taskId, "id", "i", 0, "task id")
 	SubDeleteCmd.PersistentFlags().IntVarP(&subTaskId, "sid", "s", 0, "sub task id")
