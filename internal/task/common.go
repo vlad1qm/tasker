@@ -37,12 +37,12 @@ var (
 	RowPrompt string = DefaultRowPrompt
 )
 
-
 type TaskType interface {
 	Task | SubTask
 	GetId() string
 	GetValueOf(string) string
 }
+
 type FieldType interface {
 	string | bool
 }

@@ -14,10 +14,8 @@ import (
 
 var (
 	SubTaskFieldsChoices = newChoice(t.LCSubTaskFields, "")
+	SubTaskFieldChoicesHelp string = fmt.Sprintf("subtask field to edit:[%v]", strings.Join(t.LCSubTaskFields, ","))
 )
-
-var SubTaskFieldChoicesHelp string = fmt.Sprintf("subtask field to edit:[%v]", strings.Join(t.LCSubTaskFields, ","))
-
 
 var SubEditCmd = &cobra.Command{
 	Use: "sub",
