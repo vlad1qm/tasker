@@ -20,7 +20,16 @@ const (
 	FieldId string = "Id"
 )
 
-var TaskAddFields = []string{"Title", "Url", "Description"}
+var (
+	TaskAddFields = []string{"Title", "Url", "Description", "Note", "Status", "Priority"}
+	TaskRowFields = []string{"Title", "Url", "Description"}
+	TaskEditorFields = []string{"Note"}
+	TaskChoiceFields = []string{"Status", "Priority"}
+	Choices = map[string][]string{
+		"Status": {StatusNew, StatusOpen, StatusPause, StatusClosed},
+		"Priority": {PriorityLow, PriorityMedium, PriorityHigh, PriorityUrgent},
+	}
+)
 
 type Task struct {
 	Id string `yaml:"id"`

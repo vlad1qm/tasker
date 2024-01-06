@@ -4,7 +4,13 @@ import (
 	"reflect"
 )
 
-var SubTaskAddFields = []string{"Title", "Description"}
+var (
+	SubTaskAddFields = []string{"Title", "Description", "Note"}
+	SubTaskRowFields = []string{"Title", "Description"}
+	SubTaskEditorFields = []string{"Note"}
+	SubTaskChoiceFields = []string{}
+)
+
 
 type SubTask struct {
 	Id string `yaml:"id"`
@@ -59,6 +65,16 @@ func GetSubTask(taskId string, subTaskId string)SubTask{
 		}
 	}
 	return SubTask{}
+}
+
+func GetSubTasks(taskId string)[]SubTask{
+	_, tasks := GetTasks()
+	for _, task := range tasks{
+		if task.Id == taskId{
+			return task.SubTasks
+		}
+	}
+	return []SubTask{}
 }
 
 func EditSubTask[F FieldType](taskId string, subTaskId string, fieldName string, fieldData F)error{

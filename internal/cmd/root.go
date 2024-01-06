@@ -27,9 +27,12 @@ func Execute(){
 }
 
 func init(){
+	rootCmd.AddCommand(ListCmd)
 	rootCmd.AddCommand(AddCmd)
 	rootCmd.AddCommand(ShowCmd)
 	rootCmd.AddCommand(DeleteCmd)
+	ListCmd.AddCommand(SubListCmd)
+	SubListCmd.PersistentFlags().IntVarP(&taskId, "id", "i", 0, "task id")
 	AddCmd.AddCommand(SubAddCmd)
 	SubAddCmd.PersistentFlags().IntVarP(&taskId, "id", "i", 0, "task id")
 	ShowCmd.AddCommand(SubShowCmd)
