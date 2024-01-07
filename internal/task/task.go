@@ -25,6 +25,7 @@ const (
 	FieldNote string = "Note"
 	FieldStatus string = "Status"
 	FieldPriority string = "Priority"
+	FieldSubTasks string = "SubTasks"
 )
 
 var (

@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"fmt"
+	// "fmt"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -17,6 +17,7 @@ var ShowCmd = &cobra.Command{
 			os.Exit(1)
 		}
 		task := t.GetTask(t.IntToString(taskId))
-		fmt.Println(task)
+		tt := t.TaskTable[t.Task]{Task: task}
+		tt.MakeTaskTable()
 	}, 
 }
