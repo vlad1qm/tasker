@@ -10,7 +10,11 @@ var ListCmd = &cobra.Command{
 	Short: "list all tasks",
 	Run: func(cmd *cobra.Command, args []string) {
 		_, tasks := t.GetTasks()
-		tlt := t.TaskListTable[t.Task]{Tasks: tasks}
+		tlt := t.TaskListTable[t.Task]{
+			Tasks: tasks, 
+			FilterFields: t.TaskListFilter, 
+			Colorize: true,
+		}
 		tlt.MakeTaskTable()
 	}, 
 }

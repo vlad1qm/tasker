@@ -15,7 +15,11 @@ var SubListCmd = &cobra.Command{
 			os.Exit(1)
 		}
 		subtasks := t.GetSubTasks(t.IntToString(taskId))
-		tlt := t.TaskListTable[t.SubTask]{Tasks: subtasks}
+		tlt := t.TaskListTable[t.SubTask]{
+			Tasks: subtasks, 
+			FilterFields: t.TaskListFilter,
+			Colorize: false,
+		}
 		tlt.MakeTaskTable()
 	}, 
 }

@@ -33,7 +33,7 @@ func (st *SubTask)Create(fieldName string, fieldData string){
 
 func (st *SubTask)Add(taskId string)error{
 	y, tasks := GetTasks()
-	taskIndex := FindIndex(tasks, FieldId, taskId)
+	taskIndex := FindTaskIndex(tasks, FieldId, taskId)
 	subtasks := tasks[taskIndex].SubTasks
 	st.Id = IntToString(GetNewId(subtasks))
 	st.Created = GetCurrentTime()
@@ -90,9 +90,9 @@ func EditSubTask[F FieldType](taskId string, subTaskId string, fieldName string,
 	fieldType := reflect.ValueOf(fieldData)
 	y, tasks := GetTasks()
 
-	taskIndex := FindIndex(tasks, FieldId, taskId)
+	taskIndex := FindTaskIndex(tasks, FieldId, taskId)
 	subtasks := tasks[taskIndex].SubTasks
-	subTaskIndex := FindIndex(subtasks, FieldId, subTaskId)
+	subTaskIndex := FindTaskIndex(subtasks, FieldId, subTaskId)
 
 	st := &subtasks[subTaskIndex]
 	taskElements := reflect.ValueOf(st).Elem()
@@ -115,7 +115,7 @@ func EditSubTask[F FieldType](taskId string, subTaskId string, fieldName string,
 
 func DeleteSubTask(taskId string, subTaskId string)error{
 	y, tasks := GetTasks()
-	taskIndex := FindIndex(tasks, FieldId, taskId)
+	taskIndex := FindTaskIndex(tasks, FieldId, taskId)
 	subtasks := tasks[taskIndex].SubTasks
 	result := DeleteFromTasks(subtasks, FieldId, subTaskId)
 	tasks[taskIndex].SubTasks = result

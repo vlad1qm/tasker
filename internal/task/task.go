@@ -14,9 +14,9 @@ const (
 
 	StatusDefault string = StatusNew
 	StatusNew string = "new"
-	StatusOpen string = "open"
+	StatusOpen string = "in progress"
 	StatusPause string = "pause"
-	StatusClosed string = "closed"
+	StatusClosed string = "done"
 
 	FieldId string = "Id"
 	FieldTitle string = "Title"
@@ -122,7 +122,7 @@ func GetTaskFieldValue(taskId string, fieldName string)string{
 
 func EditTask(taskId string, fieldName string, fieldData string)error{
 	y, tasks := GetTasks()
-	taskIndex := FindIndex(tasks, FieldId, taskId)
+	taskIndex := FindTaskIndex(tasks, FieldId, taskId)
 
 	t := &tasks[taskIndex]
 	taskElements := reflect.ValueOf(t).Elem()

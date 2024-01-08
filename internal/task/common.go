@@ -140,13 +140,31 @@ func GetNewId[T TaskType](t []T)int{
 	return newId + 1
 }
 
-func FindIndex[T TaskType](t []T, fieldName string, key string) int{
+func FindTaskIndex[T TaskType](t []T, fieldName string, key string) int{
 	for index, value := range t{
 		if key == value.GetValueOf(fieldName) {
 			return index
 		}
 	}
 	return -1
+}
+
+func FindIndex(i []string, key string) int{
+	for index, value := range i{
+		if key == value {
+			return index
+		}
+	}
+	return -1
+}
+
+func MakeMap(headers []string, row []string) map[string]string{
+	m := map[string]string{}
+	count := len(headers)
+	for i := 0; i < count; i++{
+		m[headers[i]] = row[i]
+	}
+	return m
 }
 
 func IsInSlice(name string, s []string)bool{
@@ -167,6 +185,16 @@ func DeleteFromTasks[T TaskType](t []T, fieldName string, taskId string) []T{
 		}
 	}
 	return t[:index]
+}
+
+func DeleteFromSliceByIndex(s []string, indexToDelete int) []string{
+	newSlice := []string{}
+	for index, value := range s{
+		if indexToDelete != index{
+			newSlice = append(newSlice, value)
+		}
+	}
+	return newSlice
 }
 
 func RowInput(fieldName string, text string)string{

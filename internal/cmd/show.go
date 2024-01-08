@@ -17,7 +17,7 @@ var ShowCmd = &cobra.Command{
 			os.Exit(1)
 		}
 		task := t.GetTask(t.IntToString(taskId))
-		tt := t.TaskTable[t.Task]{Task: task}
+		tt := t.TaskTable[t.Task]{Task: task, Colorize: true}
 		tt.MakeTaskTable()
 	}, 
 }
