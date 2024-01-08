@@ -2,6 +2,8 @@ package task
 
 import (
 	"reflect"
+	"os"
+	"github.com/wsxiaoys/terminal/color"
 )
 
 var (
@@ -70,6 +72,10 @@ func GetSubTask(taskId string, subTaskId string)SubTask{
 
 func GetSubTasks(taskId string)[]SubTask{
 	_, tasks := GetTasks()
+	if len(tasks) == 0{
+		color.Println("@rThere are no tasks")
+		os.Exit(1)
+	}
 	for _, task := range tasks{
 		if task.Id == taskId{
 			return task.SubTasks
