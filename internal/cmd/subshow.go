@@ -15,8 +15,14 @@ var SubShowCmd = &cobra.Command{
 			cmd.Help()
 			os.Exit(1)
 		}
+		task := t.GetTask(t.IntToString(taskId))
 		subtask := t.GetSubTask(t.IntToString(taskId), t.IntToString(subTaskId))
-		tt := t.TaskTable[t.SubTask]{Task: subtask}
+		tt := t.TaskTable[t.SubTask]{
+			Task: subtask,
+			TaskId: task.Id,
+			TaskTitle: task.Title,
+			TaskDescription: task.Description,
+		}
 		tt.MakeTaskTable()
 	}, 
 }

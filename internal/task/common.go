@@ -158,6 +158,14 @@ func FindIndex(i []string, key string) int{
 	return -1
 }
 
+func MakeInterfaceSlice(s []string) []interface{} {
+	new := make([]interface{}, len(s))
+	for index, value := range s{
+		new[index] = value
+	}
+	return new
+}
+
 func MakeMap(headers []string, row []string) map[string]string{
 	m := map[string]string{}
 	count := len(headers)

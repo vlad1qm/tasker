@@ -18,6 +18,9 @@ const (
 	StatusPause string = "pause"
 	StatusClosed string = "done"
 
+	CheckedTrue string = "yes"
+	CheckedFalse string = "no"
+
 	FieldId string = "Id"
 	FieldTitle string = "Title"
 	FieldUrl string = "Url"
@@ -26,6 +29,7 @@ const (
 	FieldStatus string = "Status"
 	FieldPriority string = "Priority"
 	FieldSubTasks string = "SubTasks"
+	FieldChecked string = "Checked"
 )
 
 var (
@@ -35,8 +39,9 @@ var (
 	LCFieldNote string = strings.ToLower(FieldNote)
 	LCFieldStatus string = strings.ToLower(FieldStatus)
 	LCFieldPriority string = strings.ToLower(FieldPriority)
+	LCFieldChecked string = strings.ToLower(FieldChecked)
 	LCTaskFields = []string{LCFieldTitle, LCFieldUrl, LCFieldDescription, LCFieldNote, LCFieldStatus, LCFieldPriority}
-	LCSubTaskFields = []string{LCFieldTitle, LCFieldDescription, LCFieldNote}
+	LCSubTaskFields = []string{LCFieldTitle, LCFieldDescription, LCFieldNote, LCFieldChecked}
 
 	TaskAddFields = []string{FieldTitle, FieldUrl, FieldDescription, FieldNote, FieldStatus, FieldPriority}
 	TaskEditFields = []string{FieldTitle, FieldUrl, FieldDescription, FieldNote, FieldStatus, FieldPriority}
@@ -46,6 +51,7 @@ var (
 	Choices = map[string][]string{
 		FieldStatus: {StatusNew, StatusOpen, StatusPause, StatusClosed},
 		FieldPriority: {PriorityLow, PriorityMedium, PriorityHigh, PriorityUrgent},
+		FieldChecked: {CheckedTrue, CheckedFalse},
 	}
 )
 

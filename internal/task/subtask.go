@@ -9,13 +9,13 @@ var (
 	SubTaskEditFields = []string{FieldTitle, FieldDescription, FieldNote}
 	SubTaskRowFields = []string{FieldTitle, FieldDescription}
 	SubTaskEditorFields = []string{FieldNote}
-	SubTaskChoiceFields = []string{}
+	SubTaskChoiceFields = []string{FieldChecked}
 )
 
 
 type SubTask struct {
 	Id string `yaml:"id"`
-	Checked bool `yaml:"checked"`
+	Checked string `yaml:"checked"`
 	Title string `yaml:"title"`
 	Description string `yaml:"description"`
 	Created string `yaml:"created"`
