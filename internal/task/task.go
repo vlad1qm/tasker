@@ -3,6 +3,7 @@ package task
 import (
 	"reflect"
 	"strings"
+	"github.com/wsxiaoys/terminal/color"
 )
 
 const (
@@ -89,6 +90,7 @@ func (t *Task)Add()error{
 	}
 	tasks = append(tasks, *t)
 	y.Write(tasks)
+	color.Printf("@gTask with id %v was created \n", t.Id)
 	return nil
 }
 

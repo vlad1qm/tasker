@@ -42,6 +42,7 @@ func (st *SubTask)Add(taskId string)error{
 	subtasks = append(subtasks, *st)
 	tasks[taskIndex].SubTasks = subtasks
 	y.Write(tasks)
+	color.Printf("@gSubTask with id %v was created within Task with id %v\n", st.Id, taskId)
 	return nil
 }
 
