@@ -17,6 +17,7 @@ const (
 	StatusOpen string = "in progress"
 	StatusPause string = "pause"
 	StatusClosed string = "done"
+	StatusWaiting string = "waiting"
 
 	CheckedTrue string = "yes"
 	CheckedFalse string = "no"
@@ -49,7 +50,7 @@ var (
 	TaskEditorFields = []string{FieldNote}
 	TaskChoiceFields = []string{FieldStatus, FieldPriority}
 	Choices = map[string][]string{
-		FieldStatus: {StatusNew, StatusOpen, StatusPause, StatusClosed},
+		FieldStatus: {StatusNew, StatusOpen, StatusPause, StatusWaiting, StatusClosed},
 		FieldPriority: {PriorityLow, PriorityMedium, PriorityHigh, PriorityUrgent},
 		FieldChecked: {CheckedTrue, CheckedFalse},
 	}

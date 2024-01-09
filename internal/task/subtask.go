@@ -7,7 +7,7 @@ import (
 )
 
 var (
-	SubTaskAddFields = []string{FieldTitle, FieldDescription, FieldNote}
+	SubTaskAddFields = []string{FieldTitle, FieldDescription, FieldNote, FieldChecked}
 	SubTaskEditFields = []string{FieldTitle, FieldDescription, FieldNote}
 	SubTaskRowFields = []string{FieldTitle, FieldDescription}
 	SubTaskEditorFields = []string{FieldNote}

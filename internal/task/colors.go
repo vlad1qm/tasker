@@ -13,6 +13,7 @@ var (
 	ColorFGYellowBGWhite string = "@{!wY}"
 	ColorFGGreenBGWhite string = "@{!wG}"
 	ColorFGWhiteBgBlack string = "@{!wK}"
+	ColorFGWhiteBGCyan string = "@{!wC}"
 	ColorNone string = ""
 
 	PriorityColors = map[string]string{
@@ -27,5 +28,6 @@ var (
 		StatusNew: ColorFGWhiteBgBlack,
 		StatusPause: ColorFGYellowBGWhite,
 		StatusClosed: ColorFGGreenBGWhite,
+		StatusWaiting: ColorFGWhiteBGCyan,
 	}
 )
