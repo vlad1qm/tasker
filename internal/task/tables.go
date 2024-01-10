@@ -170,13 +170,16 @@ func (tlt *TaskListTable[T]) MakeTaskTable(){
 	t.AppendHeader(MakeRow(tlt.Headers))
 	for _, row := range tlt.Data{
 		for i, t := range row{
-			row[i] = text.WrapSoft(t, 40)
+			row[i] = text.WrapSoft(t, 50)
 		}
 		t.AppendRow(MakeRow(tlt.ColorizeTaskListTable(row)))
 	}
 	t.SetStyle(table.StyleColoredBlackOnYellowWhite)
 	t.SortBy([]table.SortBy{
-		{Name: "Status", Mode: table.AscNumeric},
+		{Name: "Status", Mode: table.Asc},
+	})
+	t.SetColumnConfigs([]table.ColumnConfig{
+		{Number: 3, WidthMin: 50},
 	})
 	t.SuppressEmptyColumns()
 	t.Render()
