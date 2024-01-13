@@ -4,6 +4,7 @@ import (
 	"os"
 	"github.com/spf13/cobra"
 	t "tasker/internal/task"
+	"tasker/internal/common"
 )
 
 var SubListCmd = &cobra.Command{
@@ -14,7 +15,7 @@ var SubListCmd = &cobra.Command{
 			cmd.Help()
 			os.Exit(1)
 		}
-		subtasks := t.GetSubTasks(t.IntToString(taskId))
+		subtasks := t.GetSubTasks(common.IntToString(taskId))
 		tlt := t.TaskListTable[t.SubTask]{
 			Tasks: subtasks, 
 			FilterFields: t.TaskListFilter,

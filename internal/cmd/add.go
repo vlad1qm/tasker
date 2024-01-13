@@ -1,9 +1,8 @@
 package cmd
 
 import (
-	// "fmt"
 	t "tasker/internal/task"
-
+	"tasker/internal/common"
 	"github.com/spf13/cobra"
 )
 
@@ -14,14 +13,18 @@ var AddCmd = &cobra.Command{
 		var result string
 		task := t.Task{}
 		for _, field := range t.TaskAddFields{
+			i := common.Input{
+				FieldName: field, 
+				Data: "",
+			}
 			switch {
-			case t.IsInSlice(field, t.TaskRowFields):
-				result = t.RowInput(field, "")
-			case t.IsInSlice(field, t.TaskEditorFields):
-				result = t.TextInput(field, "")
-			case t.IsInSlice(field, t.TaskChoiceFields):
-				choices := t.Choices[field]
-				result = t.ChoiceInput(field, choices)
+			case common.IsInSlice(field, t.TaskRowFields):
+				result = i.Row()
+			case common.IsInSlice(field, t.TaskEditorFields):
+				result = i.Text()
+			case common.IsInSlice(field, t.TaskChoiceFields):
+				i.Choices = t.Choices[field]
+				result = i.Choice()
 			}
 			task.Create(field, result)
 		}

@@ -5,6 +5,7 @@ import (
 	"os"
 	"github.com/spf13/cobra"
 	t "tasker/internal/task"
+	"tasker/internal/common"
 )
 
 var SubShowCmd = &cobra.Command{
@@ -15,8 +16,8 @@ var SubShowCmd = &cobra.Command{
 			cmd.Help()
 			os.Exit(1)
 		}
-		task := t.GetTask(t.IntToString(taskId))
-		subtask := t.GetSubTask(t.IntToString(taskId), t.IntToString(subTaskId))
+		task := t.GetTask(common.IntToString(taskId))
+		subtask := t.GetSubTask(common.IntToString(taskId), common.IntToString(subTaskId))
 		tt := t.TaskTable[t.SubTask]{
 			Task: subtask,
 			TaskId: task.Id,

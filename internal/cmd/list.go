@@ -1,7 +1,9 @@
 package cmd
 
 import (
+	"fmt"
 	"os"
+	c "tasker/internal/config"
 	t "tasker/internal/task"
 
 	"github.com/spf13/cobra"
@@ -12,7 +14,11 @@ var ListCmd = &cobra.Command{
 	Use: "list",
 	Short: "list all tasks",
 	Run: func(cmd *cobra.Command, args []string) {
-		_, tasks := t.GetTasks()
+		fmt.Println(c.Configuration)
+		 _, tasks, err := t.GetTasks()
+		if err != nil{
+			fmt.Println(err)
+		}
 		if len(tasks) == 0{
 			color.Println("@rThere are no tasks")
 			os.Exit(1)

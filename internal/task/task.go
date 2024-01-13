@@ -1,8 +1,12 @@
 package task
 
 import (
+	"errors"
+	"fmt"
 	"reflect"
 	"strings"
+	"tasker/internal/common"
+
 	"github.com/wsxiaoys/terminal/color"
 )
 
@@ -79,12 +83,15 @@ func (t *Task)Create(fieldName string, fieldData string){
 }
 
 func (t *Task)Add()error{
-	y, tasks := GetTasks()
-	t.Id = IntToString(GetNewId(tasks))
+	y, tasks, err := GetTasks()
+	if err != nil{
+		fmt.Println(err)
+	}
+	t.Id = common.IntToString(GetNewId(tasks))
 	if t.Status == ""{
 		t.Status = StatusDefault
 	}
-	t.Created = GetCurrentTime()
+	t.Created = common.GetCurrentTime(common.TimeFormat)
 	if t.Priority == ""{
 		t.Priority = PriorityDefault
 	}
@@ -105,8 +112,51 @@ func (t Task)GetValueOf(fieldName string)string{
 	return field.String()
 }
 
+type TaskType interface {
+	Task | SubTask
+	GetId() string
+	GetValueOf(string) string
+}
+
+func GetNewId[T TaskType](t []T)int{
+	var newId int
+	if len(t) == 0{
+		return 1
+	}
+	for _, task := range t{
+		taskId := common.StringToInt(task.GetId())
+		if taskId > newId{
+			newId = taskId
+		}
+	}
+	return newId + 1
+}
+
+func FindTaskIndex[T TaskType](t []T, fieldName string, key string) int{
+	for index, value := range t{
+		if key == value.GetValueOf(fieldName) {
+			return index
+		}
+	}
+	return -1
+}
+
+func DeleteFromTasks[T TaskType](t []T, fieldName string, taskId string) []T{
+	index := 0
+	for _, value := range t{
+		if taskId != value.GetValueOf(fieldName){
+			t[index] = value
+			index++
+		}
+	}
+	return t[:index]
+}
+
 func GetTask(taskId string)Task{
-	_, tasks := GetTasks()
+	_, tasks, err := GetTasks()
+	if err != nil{
+		fmt.Println(err)
+	}
 	for _, task := range tasks{
 		if task.Id == taskId{
 			return task
@@ -115,22 +165,29 @@ func GetTask(taskId string)Task{
 	return Task{}
 }
 
-func GetTasks()(Yaml, []Task){
-	y := Yaml{Path: FilePath}
-	tasks := y.GetTasks()
-	return y, tasks
+func GetTasks()(common.Yaml, []Task, error){
+	y := common.Yaml{Path: common.FilePath}
+	y.Read()
+	decoded := y.Decode([]Task{})
+	tasks, ok := decoded.([]Task)
+	if ok{
+		return y, tasks, nil
+	}
+	return y, []Task{}, errors.New("coldnt get tasks")
+
 }
 
 func GetTaskFieldValue(taskId string, fieldName string)string{
 	task := GetTask(taskId)
-	t := &task
-	taskElements := reflect.ValueOf(t).Elem()
-	taskField := taskElements.FieldByName(fieldName)
-	return taskField.String()
+	field := task.GetValueOf(fieldName)
+	return field
 }
 
 func EditTask(taskId string, fieldName string, fieldData string)error{
-	y, tasks := GetTasks()
+	y, tasks, err := GetTasks()
+	if err != nil{
+		fmt.Println(err)
+	}
 	taskIndex := FindTaskIndex(tasks, FieldId, taskId)
 
 	t := &tasks[taskIndex]
@@ -140,14 +197,17 @@ func EditTask(taskId string, fieldName string, fieldData string)error{
 	if taskField.CanSet(){
 		taskField.SetString(fieldData)
 	}
-	t.Updated = GetCurrentTime()
+	t.Updated = common.GetCurrentTime(common.TimeFormat)
 	
 	y.Write(tasks)
 	return nil
 }
 
 func DeleteTask(taskId string)error{
-	y, tasks := GetTasks()
+	y, tasks, err := GetTasks()
+	if err != nil{
+		fmt.Println(err)
+	}
 	result := DeleteFromTasks(tasks, FieldId, taskId)
 	y.Write(result)
 	return nil

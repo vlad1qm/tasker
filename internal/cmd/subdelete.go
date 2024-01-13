@@ -5,6 +5,7 @@ import (
 
 	"github.com/spf13/cobra"
 	t "tasker/internal/task"
+	"tasker/internal/common"
 )
 
 var SubDeleteCmd = &cobra.Command{
@@ -15,6 +16,6 @@ var SubDeleteCmd = &cobra.Command{
 			cmd.Help()
 			os.Exit(1)
 		}
-		t.DeleteSubTask(t.IntToString(taskId), t.IntToString(subTaskId))
+		t.DeleteSubTask(common.IntToString(taskId), common.IntToString(subTaskId))
 	}, 
 }

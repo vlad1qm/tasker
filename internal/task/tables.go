@@ -8,6 +8,7 @@ import (
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/jedib0t/go-pretty/v6/text"
 	"github.com/wsxiaoys/terminal/color"
+	"tasker/internal/common"
 )
 
 var TaskListFilter = []string{FieldNote}
@@ -140,7 +141,7 @@ func (tlt *TaskListTable[T])MakeListTasksData(){
 						count++
 					}
 				}
-				str = IntToString(count)
+				str = common.IntToString(count)
 			}else{
 				str = fmt.Sprint(value)
 			}
@@ -153,10 +154,10 @@ func (tlt *TaskListTable[T])MakeListTasksData(){
 func (tlt *TaskListTable[T])Filter(){
 	var index int
 	for _, filter := range tlt.FilterFields{
-		index = FindIndex(tlt.Headers, filter)
-		tlt.Headers = DeleteFromSliceByIndex(tlt.Headers, index)
+		index = common.FindIndex(tlt.Headers, filter)
+		tlt.Headers = common.DeleteFromSliceByIndex(tlt.Headers, index)
 		for taskIndex, _ := range tlt.Data{
-			tlt.Data[taskIndex] = DeleteFromSliceByIndex(tlt.Data[taskIndex], index)
+			tlt.Data[taskIndex] = common.DeleteFromSliceByIndex(tlt.Data[taskIndex], index)
 		}
 	}
 }

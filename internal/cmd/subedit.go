@@ -5,6 +5,7 @@ import (
 	"os"
 	"strings"
 	t "tasker/internal/task"
+	"tasker/internal/common"
 
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
@@ -26,19 +27,24 @@ var SubEditCmd = &cobra.Command{
 			os.Exit(1)
 		}
 		var result string
-		taskId := t.IntToString(taskId)
-		subTaskId := t.IntToString(subTaskId)
+		taskId := common.IntToString(taskId)
+		subTaskId := common.IntToString(subTaskId)
 		field, _ := cmd.Flags().GetString("field")
 		field = cases.Title(language.English, cases.Compact).String(field)
 		fieldValue := t.GetSubTaskFieldValue(taskId, subTaskId, field)
+		i := common.Input{
+			FieldName: field,
+		}
 			switch {
-			case t.IsInSlice(field, t.SubTaskRowFields):
-				result = t.RowInput(field, fieldValue)
-			case t.IsInSlice(field, t.SubTaskEditorFields):
-				result = t.TextInput(field, fieldValue)
-			case t.IsInSlice(field, t.SubTaskChoiceFields):
-				choices := t.Choices[field]
-				result = t.ChoiceInput(field, choices)
+			case common.IsInSlice(field, t.SubTaskRowFields):
+				i.Data = fieldValue
+				result = i.Row()
+			case common.IsInSlice(field, t.SubTaskEditorFields):
+				i.Data = fieldValue
+				result = i.Text()
+			case common.IsInSlice(field, t.SubTaskChoiceFields):
+				i.Choices = t.Choices[field]
+				result = i.Choice()
 			}
 		t.EditSubTask(taskId, subTaskId, field, result)
 	},

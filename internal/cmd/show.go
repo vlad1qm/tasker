@@ -1,11 +1,11 @@
 package cmd
 
 import (
-	// "fmt"
 	"os"
 
 	"github.com/spf13/cobra"
 	t "tasker/internal/task"
+	"tasker/internal/common"
 )
 
 var ShowCmd = &cobra.Command{
@@ -16,7 +16,7 @@ var ShowCmd = &cobra.Command{
 			cmd.Help()
 			os.Exit(1)
 		}
-		task := t.GetTask(t.IntToString(taskId))
+		task := t.GetTask(common.IntToString(taskId))
 		tt := t.TaskTable[t.Task]{Task: task, Colorize: true}
 		tt.MakeTaskTable()
 	}, 

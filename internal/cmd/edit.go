@@ -5,6 +5,7 @@ import (
 	"os"
 	"strings"
 	t "tasker/internal/task"
+	"tasker/internal/common"
 
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
@@ -26,18 +27,23 @@ var EditCmd = &cobra.Command{
 			os.Exit(1)
 		}
 		var result string
-		taskId := t.IntToString(taskId)
+		taskId := common.IntToString(taskId)
 		field, _ := cmd.Flags().GetString("field")
 		field = cases.Title(language.English, cases.Compact).String(field)
 		fieldValue := t.GetTaskFieldValue(taskId, field)
+		i := common.Input{
+			FieldName: field,
+		}
 			switch {
-			case t.IsInSlice(field, t.TaskRowFields):
-				result = t.RowInput(field, fieldValue)
-			case t.IsInSlice(field, t.TaskEditorFields):
-				result = t.TextInput(field, fieldValue)
-			case t.IsInSlice(field, t.TaskChoiceFields):
-				choices := t.Choices[field]
-				result = t.ChoiceInput(field, choices)
+			case common.IsInSlice(field, t.TaskRowFields):
+				i.Data = fieldValue
+				result = i.Row()
+			case common.IsInSlice(field, t.TaskEditorFields):
+				i.Data = fieldValue
+				result = i.Text()
+			case common.IsInSlice(field, t.TaskChoiceFields):
+				i.Choices = t.Choices[field]
+				result = i.Choice()
 			}
 		t.EditTask(taskId, field, result)
 	},

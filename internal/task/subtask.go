@@ -3,7 +3,9 @@ package task
 import (
 	"reflect"
 	"os"
+	"fmt"
 	"github.com/wsxiaoys/terminal/color"
+	"tasker/internal/common"
 )
 
 var (
@@ -34,11 +36,14 @@ func (st *SubTask)Create(fieldName string, fieldData string){
 }
 
 func (st *SubTask)Add(taskId string)error{
-	y, tasks := GetTasks()
+	y, tasks, err := GetTasks()
+	if err != nil{
+		fmt.Println(err)
+	}
 	taskIndex := FindTaskIndex(tasks, FieldId, taskId)
 	subtasks := tasks[taskIndex].SubTasks
-	st.Id = IntToString(GetNewId(subtasks))
-	st.Created = GetCurrentTime()
+	st.Id = common.IntToString(GetNewId(subtasks))
+	st.Created = common.GetCurrentTime(common.TimeFormat)
 	subtasks = append(subtasks, *st)
 	tasks[taskIndex].SubTasks = subtasks
 	y.Write(tasks)
@@ -58,7 +63,10 @@ func (st SubTask)GetValueOf(fieldName string)string{
 }
 
 func GetSubTask(taskId string, subTaskId string)SubTask{
-	_, tasks := GetTasks()
+	_, tasks, err := GetTasks()
+	if err != nil{
+		fmt.Println(err)
+	}
 	for _, task := range tasks{
 		if task.Id == taskId{
 			for _, subtask := range task.SubTasks{
@@ -72,7 +80,10 @@ func GetSubTask(taskId string, subTaskId string)SubTask{
 }
 
 func GetSubTasks(taskId string)[]SubTask{
-	_, tasks := GetTasks()
+	_, tasks, err := GetTasks()
+	if err != nil{
+		fmt.Println(err)
+	}
 	if len(tasks) == 0{
 		color.Println("@rThere are no tasks")
 		os.Exit(1)
@@ -87,15 +98,16 @@ func GetSubTasks(taskId string)[]SubTask{
 
 func GetSubTaskFieldValue(taskId string, subTaskId string, fieldName string)string{
 	subtask := GetSubTask(taskId, subTaskId)
-	st := &subtask
-	taskElements := reflect.ValueOf(st).Elem()
-	taskField := taskElements.FieldByName(fieldName)
-	return taskField.String()
+	field := subtask.GetValueOf(fieldName)
+	return field
 }
 
-func EditSubTask[F FieldType](taskId string, subTaskId string, fieldName string, fieldData F)error{
+func EditSubTask(taskId string, subTaskId string, fieldName string, fieldData string)error{
 	fieldType := reflect.ValueOf(fieldData)
-	y, tasks := GetTasks()
+	y, tasks, err := GetTasks()
+	if err != nil{
+		fmt.Println(err)
+	}
 
 	taskIndex := FindTaskIndex(tasks, FieldId, taskId)
 	subtasks := tasks[taskIndex].SubTasks
@@ -115,13 +127,16 @@ func EditSubTask[F FieldType](taskId string, subTaskId string, fieldName string,
 			taskField.SetBool(fieldType.Bool())
 		}
 	}
-	st.Updated = GetCurrentTime()
+	st.Updated = common.GetCurrentTime(common.TimeFormat)
 	y.Write(tasks)
 	return nil
 }
 
 func DeleteSubTask(taskId string, subTaskId string)error{
-	y, tasks := GetTasks()
+	y, tasks, err := GetTasks()
+	if err != nil{
+		fmt.Println(err)
+	}
 	taskIndex := FindTaskIndex(tasks, FieldId, taskId)
 	subtasks := tasks[taskIndex].SubTasks
 	result := DeleteFromTasks(subtasks, FieldId, subTaskId)
