@@ -6,14 +6,19 @@ import (
 
 var (
 	ColorUrl string = "@{!wB}"
+
 	ColorCheckedTrue string = ColorFGGreenBGWhite
 	ColorCheckedFalse string = ColorFGRedBGWhite
+
 	ColorFGRedBGWhite string = "@{!wR}"
 	ColorFGMagentaBGWhite string = "@{!wM}"
 	ColorFGYellowBGWhite string = "@{!wY}"
 	ColorFGGreenBGWhite string = "@{!wG}"
 	ColorFGWhiteBgBlack string = "@{!wK}"
 	ColorFGWhiteBGCyan string = "@{!wC}"
+
+	ColorGreen string = "@g"
+	ColorRed string = "@r"
 	ColorNone string = ""
 
 	PriorityColors = map[string]string{

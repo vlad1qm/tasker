@@ -4,14 +4,46 @@ import (
 	"fmt"
 	"os"
 
+	"tasker/internal/common"
+	"tasker/internal/config"
+
 	"github.com/fatih/structs"
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/jedib0t/go-pretty/v6/text"
 	"github.com/wsxiaoys/terminal/color"
-	"tasker/internal/common"
 )
+const (
+	
+)
+var (
+	DefaultRowTaskListFilter = map[string]string{FieldStatus: StatusClosed}
+	ColumnTaskListFilter = []string{FieldNote}
+	RowTaskListFilter = DefaultRowTaskListFilter
 
-var TaskListFilter = []string{FieldNote}
+	TableStyles = map[string]table.Style{
+		"StyleColoredBright": table.StyleColoredBright,
+		"StyleColoredDark": table.StyleColoredDark,
+		"StyleColoredBlackOnBlueWhite": table.StyleColoredBlackOnBlueWhite,
+		"StyleColoredBlackOnCyanWhite": table.StyleColoredBlackOnCyanWhite,
+		"StyleColoredBlackOnGreenWhite": table.StyleColoredBlackOnGreenWhite,
+		"StyleColoredBlackOnMagentaWhite": table.StyleColoredBlackOnMagentaWhite,
+		"StyleColoredBlackOnYellowWhite": table.StyleColoredBlackOnYellowWhite,
+		"StyleColoredBlackOnRedWhite": table.StyleColoredBlackOnRedWhite,
+		"StyleColoredBlueWhiteOnBlack": table.StyleColoredBlueWhiteOnBlack,
+		"StyleColoredCyanWhiteOnBlack": table.StyleColoredCyanWhiteOnBlack,
+		"StyleColoredGreenWhiteOnBlack": table.StyleColoredGreenWhiteOnBlack,
+		"StyleColoredMagentaWhiteOnBlack": table.StyleColoredMagentaWhiteOnBlack,
+		"StyleColoredRedWhiteOnBlack": table.StyleColoredRedWhiteOnBlack,
+		"StyleColoredYellowWhiteOnBlack": table.StyleColoredYellowWhiteOnBlack,
+	}
+
+	TableSortDirections = map[string]table.SortMode{
+		"Asc": table.Asc,
+		"AscNumeric": table.AscNumeric,
+		"Dsc": table.Dsc,
+		"DscNumeric": table.DscNumeric,
+	}
+) 
 
 
 type TaskTable[T TaskType] struct {
@@ -108,7 +140,7 @@ func (tt *TaskTable[T]) MakeTaskTable(){
 			t.AppendRow(MakeRow(tt.ColorizeTaskTable(row)))
 		}
 		}
-		t.SetStyle(table.StyleColoredBlackOnYellowWhite)
+		t.SetStyle(TableStyles[Config.TableTheme])
 		t.SetColumnConfigs([]table.ColumnConfig{
 			{Number: 2, WidthMin: 50},
 		})
@@ -117,7 +149,8 @@ func (tt *TaskTable[T]) MakeTaskTable(){
 
 type TaskListTable[T TaskType] struct {
 	Tasks []T
-	FilterFields []string
+	ColumnFilterFields []string
+	RowFilterFields map[string]string
 	Headers []string
 	Data [][]string
 	Colorize bool
@@ -151,9 +184,9 @@ func (tlt *TaskListTable[T])MakeListTasksData(){
 	}
 }
 
-func (tlt *TaskListTable[T])Filter(){
+func (tlt *TaskListTable[T])ColumnFilter(){
 	var index int
-	for _, filter := range tlt.FilterFields{
+	for _, filter := range tlt.ColumnFilterFields{
 		index = common.FindIndex(tlt.Headers, filter)
 		tlt.Headers = common.DeleteFromSliceByIndex(tlt.Headers, index)
 		for taskIndex, _ := range tlt.Data{
@@ -162,10 +195,30 @@ func (tlt *TaskListTable[T])Filter(){
 	}
 }
 
+func (tlt *TaskListTable[T])RowFilter(){
+	var index int
+	var toDelete = []int{}
+	for field, value := range tlt.RowFilterFields{
+		index = common.FindIndex(tlt.Headers, field)
+		for taskIndex := range tlt.Data{
+			if tlt.Data[taskIndex][index] == value{
+				toDelete = append(toDelete, taskIndex)
+			}
+		}
+
+		}
+		common.ReverseSlice(toDelete)
+		for _, v := range toDelete{
+			tlt.Data =  common.DeleteFromSliceOfSliceByIndex(tlt.Data, v)
+		}
+		}
+
+
 func (tlt *TaskListTable[T]) MakeTaskTable(){
 	tlt.MakeHeaders()
 	tlt.MakeListTasksData()
-	tlt.Filter()
+	tlt.ColumnFilter()
+	tlt.RowFilter()
 	t := table.NewWriter()
 	t.SetOutputMirror(os.Stdout)
 	t.AppendHeader(MakeRow(tlt.Headers))
@@ -175,12 +228,15 @@ func (tlt *TaskListTable[T]) MakeTaskTable(){
 		}
 		t.AppendRow(MakeRow(tlt.ColorizeTaskListTable(row)))
 	}
-	t.SetStyle(table.StyleColoredBlackOnYellowWhite)
+	t.SetStyle(TableStyles[Config.TableTheme])
 	t.SortBy([]table.SortBy{
-		{Name: "Status", Mode: table.Asc},
+		{
+			Name: config.Configuration.TaskTableSortBy, 
+			Mode: TableSortDirections[Config.TaskTableSortDirection],
+		},
 	})
 	t.SetColumnConfigs([]table.ColumnConfig{
-		{Number: 3, WidthMin: 50},
+		{Number: Config.ColumnNumberMinWidth, WidthMin: Config.ColumnMinWidth},
 	})
 	t.SuppressEmptyColumns()
 	t.Render()

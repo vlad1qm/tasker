@@ -31,9 +31,15 @@ var EditCmd = &cobra.Command{
 		field, _ := cmd.Flags().GetString("field")
 		field = cases.Title(language.English, cases.Compact).String(field)
 		fieldValue := t.GetTaskFieldValue(taskId, field)
+
 		i := common.Input{
 			FieldName: field,
+			Prompt: t.Config.RowPrompt,
+			TmpPath: t.Config.TmpPath,
+			TextEditor: t.Config.TextEditor,
+			NewFolderPermissions: common.NewFolderPermissions,
 		}
+		
 			switch {
 			case common.IsInSlice(field, t.TaskRowFields):
 				i.Data = fieldValue

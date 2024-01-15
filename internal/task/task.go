@@ -3,10 +3,11 @@ package task
 import (
 	"errors"
 	"fmt"
+	"os"
 	"reflect"
 	"strings"
 	"tasker/internal/common"
-
+	c "tasker/internal/config"
 	"github.com/wsxiaoys/terminal/color"
 )
 
@@ -39,6 +40,8 @@ const (
 )
 
 var (
+	Config = c.Config{}
+
 	LCFieldTitle string = strings.ToLower(FieldTitle)
 	LCFieldUrl string = strings.ToLower(FieldUrl)
 	LCFieldDescription string = strings.ToLower(FieldDescription)
@@ -63,15 +66,19 @@ var (
 
 type Task struct {
 	Id string `yaml:"id"`
+	Status string `yaml:"status"`
+	Priority string `yaml:"priority"`
 	Title string `yaml:"title"`
 	Url string `yaml:"url"`
 	Description string `yaml:"description"`
 	Note string `yaml:"note"`
-	Priority string `yaml:"priority"`
 	Created string `yaml:"created"`
-	Status string `yaml:"status"`
 	Updated string `yaml:"updated"`
 	SubTasks []SubTask `yaml:"subtasks"`
+}
+
+func (t *Task)IsEmpty()bool{
+	return t.Id == ""
 }
 
 func (t *Task)Create(fieldName string, fieldData string){
@@ -85,19 +92,20 @@ func (t *Task)Create(fieldName string, fieldData string){
 func (t *Task)Add()error{
 	y, tasks, err := GetTasks()
 	if err != nil{
-		fmt.Println(err)
+		color.Printf(fmt.Sprintf("%vError %v was occured\n", ColorRed, err))
+		os.Exit(1)
 	}
 	t.Id = common.IntToString(GetNewId(tasks))
 	if t.Status == ""{
 		t.Status = StatusDefault
 	}
-	t.Created = common.GetCurrentTime(common.TimeFormat)
+	t.Created = common.GetCurrentTime(Config.TimeFormat)
 	if t.Priority == ""{
 		t.Priority = PriorityDefault
 	}
 	tasks = append(tasks, *t)
 	y.Write(tasks)
-	color.Printf("@gTask with id %v was created \n", t.Id)
+	color.Printf(fmt.Sprintf("%vTask with id %v was created\n", ColorGreen, t.Id))
 	return nil
 }
 
@@ -155,8 +163,10 @@ func DeleteFromTasks[T TaskType](t []T, fieldName string, taskId string) []T{
 func GetTask(taskId string)Task{
 	_, tasks, err := GetTasks()
 	if err != nil{
-		fmt.Println(err)
+		color.Printf(fmt.Sprintf("%vError %v was occured\n", ColorRed, err))
+		os.Exit(1)
 	}
+
 	for _, task := range tasks{
 		if task.Id == taskId{
 			return task
@@ -166,19 +176,23 @@ func GetTask(taskId string)Task{
 }
 
 func GetTasks()(common.Yaml, []Task, error){
-	y := common.Yaml{Path: common.FilePath}
+	y := common.Yaml{FilePath: Config.DataPath, FileName: Config.DataFileName}
 	y.Read()
 	decoded := y.Decode([]Task{})
 	tasks, ok := decoded.([]Task)
 	if ok{
 		return y, tasks, nil
 	}
-	return y, []Task{}, errors.New("coldnt get tasks")
+	return y, []Task{}, errors.New("couldnt get tasks")
 
 }
 
 func GetTaskFieldValue(taskId string, fieldName string)string{
 	task := GetTask(taskId)
+	if task.IsEmpty(){
+		color.Printf(fmt.Sprintf("%vTask with id %v was not found\n", ColorRed, taskId))
+		os.Exit(1)
+	}
 	field := task.GetValueOf(fieldName)
 	return field
 }
@@ -186,9 +200,15 @@ func GetTaskFieldValue(taskId string, fieldName string)string{
 func EditTask(taskId string, fieldName string, fieldData string)error{
 	y, tasks, err := GetTasks()
 	if err != nil{
-		fmt.Println(err)
+		color.Printf(fmt.Sprintf("%vError %v was occured\n", ColorRed, err))
+		os.Exit(1)
 	}
 	taskIndex := FindTaskIndex(tasks, FieldId, taskId)
+
+	if taskIndex == -1 {
+		color.Printf(fmt.Sprintf("%vTask with id %v was not found\n", ColorRed, taskId))
+		os.Exit(1)
+	}
 
 	t := &tasks[taskIndex]
 	taskElements := reflect.ValueOf(t).Elem()
@@ -197,7 +217,7 @@ func EditTask(taskId string, fieldName string, fieldData string)error{
 	if taskField.CanSet(){
 		taskField.SetString(fieldData)
 	}
-	t.Updated = common.GetCurrentTime(common.TimeFormat)
+	t.Updated = common.GetCurrentTime(Config.TimeFormat)
 	
 	y.Write(tasks)
 	return nil
@@ -206,7 +226,13 @@ func EditTask(taskId string, fieldName string, fieldData string)error{
 func DeleteTask(taskId string)error{
 	y, tasks, err := GetTasks()
 	if err != nil{
-		fmt.Println(err)
+		color.Printf(fmt.Sprintf("%vError %v was occured\n", ColorRed, err))
+		os.Exit(1)
+	}
+	taskIndex := FindTaskIndex(tasks, FieldId, taskId)
+	if taskIndex == -1 {
+		color.Printf(fmt.Sprintf("%vTask with id %v was not found\n", ColorRed, taskId))
+		os.Exit(1)
 	}
 	result := DeleteFromTasks(tasks, FieldId, taskId)
 	y.Write(result)

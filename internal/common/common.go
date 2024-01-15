@@ -12,6 +12,7 @@ import (
 	"gopkg.in/yaml.v2"
 	"time"
 	"strconv"
+	"sort"
 )
 
 const (
@@ -39,7 +40,8 @@ var (
 	RowPrompt string = DefaultRowPrompt
 )
 
-func FileRead(path string) ([]byte, error) {
+func FileRead(filePath string, fileName string,) ([]byte, error) {
+	path := filepath.Join(filePath, fileName)
 	data, err := os.ReadFile(path)
 	if err != nil {
 		fmt.Println(err)
@@ -47,8 +49,13 @@ func FileRead(path string) ([]byte, error) {
 	return data, err
 }
 
-func FileWrite(path string, data []byte) error {
-	err := os.WriteFile(path, data, FileWritePermissions)
+func FileWrite(filePath string, fileName string, data []byte) error {
+	path := filepath.Join(filePath, fileName)
+	err := os.MkdirAll(filePath, NewFolderPermissions)
+	if err != nil {
+		fmt.Println(err)
+	}
+	err = os.WriteFile(path, data, FileWritePermissions)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -56,7 +63,8 @@ func FileWrite(path string, data []byte) error {
 }
 
 type Yaml struct {
-	Path string
+	FilePath string
+	FileName string
 	RawData []byte
 	Data interface{}
 }
@@ -72,7 +80,7 @@ func (y *Yaml)Decode(i interface{})interface{}{
 }
 
 func (y *Yaml)Read()error{
-	data, err := FileRead(y.Path)
+	data, err := FileRead(y.FilePath, y.FileName)
 	if err != nil {
 		return err
 	}
@@ -91,7 +99,7 @@ func (y *Yaml)Write(content interface{})error{
 	if err != nil{
 		return err
 	}
-	err = FileWrite(y.Path, data)
+	err = FileWrite(y.FilePath, y.FileName, data)
 	if err != nil {
 		return err
 	}
@@ -132,7 +140,7 @@ func (i *Input)Text()string{
 		fmt.Println(err)
 	}
 	text := fmt.Sprintf("%v\n", i.Data)
-	FileWrite(path, []byte(text))
+	FileWrite(i.TmpPath, i.FieldName, []byte(text))
 	cmd := exec.Command(i.TextEditor, path)
 	cmd.Stdin = os.Stdin
     cmd.Stdout = os.Stdout
@@ -140,7 +148,7 @@ func (i *Input)Text()string{
 	if err != nil{
 		fmt.Println(err)
 	}
-	data, err := FileRead(path)
+	data, err := FileRead(i.TmpPath, i.FieldName)
 	sData := string(data)
 	last := len(sData) - 1
 	sData = sData[:last]
@@ -214,6 +222,30 @@ func DeleteFromSliceByIndex(s []string, indexToDelete int) []string{
 		}
 	}
 	return newSlice
+}
+
+func DeleteFromSliceOfSliceByIndex(s [][]string, indexToDelete int) [][]string{
+	newSlice := [][]string{}
+	for index, value := range s{
+		if indexToDelete != index{
+			newSlice = append(newSlice, value)
+		}
+	}
+	return newSlice
+}
+
+func Pop(s []int)([]int, int){
+	if len(s) > 0{
+		value := s[len(s) - 1]
+		return s[:len(s) - 1], value
+	}
+	return []int{}, 0
+}
+
+func ReverseSlice(s []int){
+	sort.SliceStable(s, func(i, j int) bool {
+        return i > j
+    })
 }
 
 func MakeInterfaceSlice(s []string) []interface{} {

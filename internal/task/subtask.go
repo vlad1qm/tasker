@@ -1,11 +1,13 @@
 package task
 
 import (
-	"reflect"
-	"os"
+	"errors"
 	"fmt"
-	"github.com/wsxiaoys/terminal/color"
+	"os"
+	"reflect"
 	"tasker/internal/common"
+
+	"github.com/wsxiaoys/terminal/color"
 )
 
 var (
@@ -27,6 +29,10 @@ type SubTask struct {
 	Note string `yaml:"note"`
 }
 
+func (st *SubTask)IsEmpty()bool{
+	return st.Id == ""
+}
+
 func (st *SubTask)Create(fieldName string, fieldData string){
 	taskElements := reflect.ValueOf(st).Elem()
 	taskField := taskElements.FieldByName(fieldName)
@@ -38,16 +44,23 @@ func (st *SubTask)Create(fieldName string, fieldData string){
 func (st *SubTask)Add(taskId string)error{
 	y, tasks, err := GetTasks()
 	if err != nil{
-		fmt.Println(err)
+		color.Printf(fmt.Sprintf("%vError %v was occured\n", ColorRed, err))
+		os.Exit(1)
 	}
 	taskIndex := FindTaskIndex(tasks, FieldId, taskId)
+
+	if taskIndex == -1 {
+		color.Printf(fmt.Sprintf("%vTask with id %v was not found\n", ColorRed, taskId))
+		os.Exit(1)
+	}
+
 	subtasks := tasks[taskIndex].SubTasks
 	st.Id = common.IntToString(GetNewId(subtasks))
 	st.Created = common.GetCurrentTime(common.TimeFormat)
 	subtasks = append(subtasks, *st)
 	tasks[taskIndex].SubTasks = subtasks
 	y.Write(tasks)
-	color.Printf("@gSubTask with id %v was created within Task with id %v\n", st.Id, taskId)
+	color.Printf(fmt.Sprintf("%vSubTask with id %v was created within Task with id %v\n", ColorGreen, st.Id, taskId))
 	return nil
 }
 
@@ -65,7 +78,8 @@ func (st SubTask)GetValueOf(fieldName string)string{
 func GetSubTask(taskId string, subTaskId string)SubTask{
 	_, tasks, err := GetTasks()
 	if err != nil{
-		fmt.Println(err)
+		color.Printf(fmt.Sprintf("%vError %v was occured\n", ColorRed, err))
+		os.Exit(1)
 	}
 	for _, task := range tasks{
 		if task.Id == taskId{
@@ -79,25 +93,29 @@ func GetSubTask(taskId string, subTaskId string)SubTask{
 	return SubTask{}
 }
 
-func GetSubTasks(taskId string)[]SubTask{
+func GetSubTasks(taskId string)([]SubTask, error){
 	_, tasks, err := GetTasks()
 	if err != nil{
 		fmt.Println(err)
 	}
 	if len(tasks) == 0{
-		color.Println("@rThere are no tasks")
+		color.Printf(fmt.Sprintf("%vThere are no tasks\n", ColorRed))
 		os.Exit(1)
 	}
 	for _, task := range tasks{
 		if task.Id == taskId{
-			return task.SubTasks
+			return task.SubTasks, nil
 		}
 	}
-	return []SubTask{}
+	return []SubTask{}, errors.New("couldnt get subtasks")
 }
 
 func GetSubTaskFieldValue(taskId string, subTaskId string, fieldName string)string{
 	subtask := GetSubTask(taskId, subTaskId)
+	if subtask.IsEmpty(){
+		color.Printf(fmt.Sprintf("%vSubTask with id %v within Task id %v was not found\n", ColorRed, subTaskId, taskId))
+		os.Exit(1)
+	}
 	field := subtask.GetValueOf(fieldName)
 	return field
 }
@@ -106,12 +124,24 @@ func EditSubTask(taskId string, subTaskId string, fieldName string, fieldData st
 	fieldType := reflect.ValueOf(fieldData)
 	y, tasks, err := GetTasks()
 	if err != nil{
-		fmt.Println(err)
+		color.Printf(fmt.Sprintf("%vError %v was occured\n", ColorRed, err))
+		os.Exit(1)
 	}
 
 	taskIndex := FindTaskIndex(tasks, FieldId, taskId)
+
+	if taskIndex == -1 {
+		color.Printf(fmt.Sprintf("%vTask with id %v was not found\n", ColorRed, taskId))
+		os.Exit(1)
+	}
+
 	subtasks := tasks[taskIndex].SubTasks
 	subTaskIndex := FindTaskIndex(subtasks, FieldId, subTaskId)
+
+	if subTaskIndex == -1 {
+		color.Printf(fmt.Sprintf("%vSubTask with id %v within Task id %v was not found\n", ColorRed, subTaskId, taskId))
+		os.Exit(1)
+	}
 
 	st := &subtasks[subTaskIndex]
 	taskElements := reflect.ValueOf(st).Elem()
@@ -135,10 +165,21 @@ func EditSubTask(taskId string, subTaskId string, fieldName string, fieldData st
 func DeleteSubTask(taskId string, subTaskId string)error{
 	y, tasks, err := GetTasks()
 	if err != nil{
-		fmt.Println(err)
+		color.Printf(fmt.Sprintf("%vError %v was occured\n", ColorRed, err))
+		os.Exit(1)
 	}
 	taskIndex := FindTaskIndex(tasks, FieldId, taskId)
+	if taskIndex == -1 {
+		color.Printf(fmt.Sprintf("%vTask with id %v was not found\n", ColorRed, taskId))
+		os.Exit(1)
+	}
+	
 	subtasks := tasks[taskIndex].SubTasks
+	subtaskIndex := FindTaskIndex(subtasks, FieldId, subTaskId)
+	if subtaskIndex == -1 {
+		color.Printf(fmt.Sprintf("%vSubTask with id %v within Task id %v was not found\n", ColorRed, subTaskId, taskId))
+		os.Exit(1)
+	}
 	result := DeleteFromTasks(subtasks, FieldId, subTaskId)
 	tasks[taskIndex].SubTasks = result
 	y.Write(tasks)

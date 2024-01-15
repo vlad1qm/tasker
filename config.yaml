@@ -1,0 +1,24 @@
+# Move to ~/.config/tasker/
+data_file_path: "/Users/v.minkin/.config/tasker/"
+data_file_name: "data.yaml"
+tmp_path: "/tmp/tasks/"
+text_editor: "vim"
+time_format: "15:04:05 02.01.2006"
+row_prompt: "$"
+
+# Available Styles
+# https://github.com/jedib0t/go-pretty/blob/main/table/style.go
+table_theme: "StyleColoredBlackOnGreenWhite"
+# StyleColoredBlackOnYellowWhite
+task_table_sort_by: "STATUS"
+
+# Available Sort Directions
+# https://github.com/jedib0t/go-pretty/blob/main/table/sort.go
+task_table_sort_direction: "Asc"
+
+# Now just 1 but later if it would needed add a list
+column_number_min_width: 5
+column_min_width: 50
+
+column_task_list_filter: ["Note"]
+row_task_list_filter: {"Status": ""}

@@ -2,3 +2,4 @@
 *.example
 .vscode/
 *.inc
+!config.yaml

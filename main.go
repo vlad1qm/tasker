@@ -2,11 +2,10 @@ package main
 
 import (
 	"tasker/internal/cmd"
-	c "tasker/internal/config"
+	t "tasker/internal/task"
 )
 
 func main(){
-	c.Configuration = c.Config{}
-	c.Configuration.Init()
+	t.Config.Init()
 	cmd.Execute()
 }

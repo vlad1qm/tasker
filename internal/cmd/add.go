@@ -6,6 +6,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
+
 var AddCmd = &cobra.Command{
 	Use: "add",
 	Short: "add task",
@@ -13,10 +14,16 @@ var AddCmd = &cobra.Command{
 		var result string
 		task := t.Task{}
 		for _, field := range t.TaskAddFields{
+
 			i := common.Input{
 				FieldName: field, 
 				Data: "",
+				Prompt: t.Config.RowPrompt,
+				TmpPath: t.Config.TmpPath,
+				TextEditor: t.Config.TextEditor,
+				NewFolderPermissions: common.NewFolderPermissions,
 			}
+			
 			switch {
 			case common.IsInSlice(field, t.TaskRowFields):
 				result = i.Row()

@@ -25,7 +25,8 @@ var ListCmd = &cobra.Command{
 		}
 		tlt := t.TaskListTable[t.Task]{
 			Tasks: tasks, 
-			FilterFields: t.TaskListFilter, 
+			ColumnFilterFields: t.Config.ColumnTaskListFilter, 
+			RowFilterFields: t.Config.RowTaskListFilter,
 			Colorize: true,
 		}
 		tlt.MakeTaskTable()

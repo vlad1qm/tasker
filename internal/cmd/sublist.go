@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"fmt"
 	"os"
 	"github.com/spf13/cobra"
 	t "tasker/internal/task"
@@ -15,10 +16,13 @@ var SubListCmd = &cobra.Command{
 			cmd.Help()
 			os.Exit(1)
 		}
-		subtasks := t.GetSubTasks(common.IntToString(taskId))
+		subtasks, err := t.GetSubTasks(common.IntToString(taskId))
+		if err != nil{
+			fmt.Println(err)
+		}
 		tlt := t.TaskListTable[t.SubTask]{
 			Tasks: subtasks, 
-			FilterFields: t.TaskListFilter,
+			ColumnFilterFields: t.ColumnTaskListFilter,
 			Colorize: false,
 		}
 		tlt.MakeTaskTable()

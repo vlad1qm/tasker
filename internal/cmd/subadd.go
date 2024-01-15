@@ -22,6 +22,10 @@ var SubAddCmd = &cobra.Command{
 			i := common.Input{
 				FieldName: field,
 				Data: "",
+				Prompt: t.Config.RowPrompt,
+				TmpPath: t.Config.TmpPath,
+				TextEditor: t.Config.TextEditor,
+				NewFolderPermissions: common.NewFolderPermissions,
 			}
 			switch {
 			case common.IsInSlice(field, t.SubTaskRowFields):
